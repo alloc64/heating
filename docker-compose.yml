@@ -1,0 +1,27 @@
+services:
+  heating:
+    container_name: heating
+    restart: unless-stopped
+    image: heating:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+
+    devices:
+      - "/dev/gpiochip0:/dev/gpiochip0"
+    volumes:
+      - heating-data:/shared-prefs.json
+    environment:
+      - JAVA_OPTS=-Xms128m -Xmx256m
+      - HEATING_THERMOMETERID_FLOOR_COLD=28-000000b9359d
+      - HEATING_THERMOMETERID_FLOOR_HOT=28-000000b95205
+      - HEATING_THERMOMETERID_TANK_HOT=28-000000bda034
+      - HEATING_THERMOMETERID_TANK_COLD=28-000000be8f90
+      - HEATING_PUMPRELAY_GPIO=26
+    ports:
+      - "6001:6001"
+volumes:
+  heating-data:
+    driver: local

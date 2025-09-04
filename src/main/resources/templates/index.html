@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Heating</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <style>
+        html, body {
+            margin: 0 10px;
+            padding: 0;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            margin: 10px 0;
+        }
+
+        ul {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul li {
+            list-style-type: none;
+            padding: 5px 0;
+        }
+
+        input, button {
+            margin: 4px 0px;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .block {
+            width: 400px;
+        }
+
+        .server-time {
+            display: block;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<p th:text="${state.message}"></p>
+<div>
+    <h2>Teploty</h2>
+    <div class="container">
+        <ul>
+            <li th:each="ts : ${state.getThermometerStates()}">
+                <span><span th:text="${ts.name}"></span>: <strong th:text="${ts.temperature?: 'N/A'}"></strong> °C</span>
+            </li>
+        </ul>
+    </div>
+    <hr>
+    <div class="title">
+        <span th:text="${state.floorPumpConfig.getName()}"></span>
+        <span style="color: rgba(32,195,32,0.82)" th:text="${state.floorPumpConfig.isEnabled() ? ('- Zapnuto (' + state.floorPumpConfig.getEnableSource() + ')') : ''}"></span>
+    </div>
+    <div class="container">
+        <div class="block">
+            <h3>Ruční zapnutí</h3>
+
+            <form action="#" method="post">
+                <label for="enabled0">Zapnuto</label>
+                <input type="checkbox" th:checked="${state.floorPumpConfig.isManualOverride()}" name="enabled" id="enabled0"/>
+                <button type="submit" th:formaction="${'/manual-override/' + state.floorPumpConfig.getId()}">Uložit</button>
+            </form>
+        </div>
+        <div class="block">
+            <h3>Zapnutí při teplotě</h3>
+
+            <form action="#" method="post">
+                <label for="triggerTemp0">Minimální teplota °C</label>
+                <input type="number" placeholder="50" th:value="${state.floorPumpConfig.getTempTrigger()}" name="triggerTemp" id="triggerTemp0"/>
+                <br>
+                <button type="submit" th:formaction="${'/temperature-trigger/' + state.floorPumpConfig.getId()}">Uložit</button>
+            </form>
+        </div>
+        <div class="block">
+            <h3>Zapnutí podle času</h3>
+
+            <form action="#" method="post">
+                <label for="minTemp0">Minimální teplota °C</label>
+                <input type="number" placeholder="50" th:value="${state.floorPumpConfig.getTempTriggerMinTemp()}" name="minTemp" id="minTemp0"/>
+                <br>
+                <label for="timeRange0">Rozmezí hodin</label>
+                <input type="text" placeholder="00:00-06:00" th:value="${state.floorPumpConfig.getTimeTrigger()}" name="timeRange" id="timeRange0"/>
+
+                <br>
+                <button type="submit" th:formaction="${'/time-trigger/' + state.floorPumpConfig.getId()}">Uložit</button>
+            </form>
+        </div>
+    </div>
+</div>
+<span class="server-time">Čas serveru: <span th:text="${state.getServerDateTime()}"></span></span>
+</body>
+</html>
